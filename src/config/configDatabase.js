@@ -7,9 +7,7 @@ async function configDatabase() {
     //TODO set database name
     const connectionsString = 'mongodb://localhost:27017/volcanoes-db';
 
-    await mongoose.connect(connectionsString, {
-        useUnifiedTopology: true
-    });
+    await mongoose.connect(connectionsString);
 
     console.log('Database connected');
 };

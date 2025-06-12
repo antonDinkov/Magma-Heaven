@@ -8,7 +8,7 @@ start();
 
 async function start() {
     const app = express();
-
+    
     await configDatabase();
     configHbs(app);
     configExpress(app);

@@ -17,15 +17,30 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/search">Search</a></li>
                 <li><a href="/catalog">All Volcanoes</a></li>
+                {{#if isUser}}
                 <li><a href="/create">Create Volcano Wiki</a></li>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
                 <li><a href="/logout">Logout</a></li>
+                {{else}}
+                <li><a href="/register">Register</a></li>
+                <li><a href="/login">Login</a></li>
+                {{/if}}
             </ul>
         </nav>
     </header>
 
     <main>
+        <!-- In case of error, you should display div with class "errorContainer" -->
+        <!-- You can choose to display the first error or all of them (error message/s in your opinion) -->
+        {{#if errors}}
+        <div>
+            <div class="errorContainer">
+                {{#each errors}}
+                    <p>{{this}}</p>
+                {{/each}}
+            </div>
+        </div>
+        {{/if}}
+
         {{{body}}}
     </main>
 

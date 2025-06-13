@@ -1,6 +1,6 @@
 const { Router } = require('express');
-const { register } = require('../services/user');
-const { isGuest } = require('../middlewares/guards');
+const { register, login } = require('../services/user');
+const { isGuest, isUser } = require('../middlewares/guards');
 const { createToken } = require('../services/jwt');
 const { body, validationResult } = require('express-validator');
 const { parseError } = require('../util');
@@ -16,14 +16,14 @@ userRouter.post('/register', isGuest(),
     body('password').trim().isLength({ min: 4 }).withMessage('Password must be atleast 4 characters long'),
     body('repass').trim().custom((value, { req }) => value == req.body.password).withMessage('Password don\'t match'),
     async (req, res) => {
-        
+
         try {
             const validation = validationResult(req);
             if (!validation.isEmpty()) {
                 throw validation.array();
             };
-            
-            const userData = register(req.body.username, req.body.email, req.body.password);
+
+            const userData = await register(req.body.username, req.body.email, req.body.password);
             const token = createToken(userData);
             res.cookie('token', token);
 
@@ -33,5 +33,36 @@ userRouter.post('/register', isGuest(),
         }
 
     })
+
+userRouter.get('/login', isGuest(), (req, res) => {
+    res.render('login');
+});
+userRouter.post('/login', isGuest(),
+    body('email').trim().isEmail().withMessage('Email must contain the standard characters').isLength({ min: 10 }).withMessage('Email must be atleast 10 characters long'),
+    body('password').trim().isLength({ min: 4 }).withMessage('Password must be atleast 4 characters long'),
+    async (req, res) => {
+        try {
+            const validation = validationResult(req);
+            if (!validation.isEmpty()) {
+                throw validation.array();
+            }
+
+            const userData = await login(req.body.email, req.body.password);
+
+            const token = createToken(userData);
+
+            res.cookie('token', token);
+
+            res.redirect('/');
+        } catch (err) {
+            res.render('login', { data: {email: req.body.email}, errors: parseError(err).errors });
+        }
+    });
+
+
+userRouter.get('/logout', isUser(), (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/');
+});
 
 module.exports = { userRouter };

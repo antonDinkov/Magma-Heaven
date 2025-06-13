@@ -2,7 +2,7 @@ const { Router } = require("express");
 const { isUser, isOwner } = require("../middlewares/guards");
 const { body, validationResult } = require("express-validator");
 const { parseError } = require("../util");
-const { create, getAll, getById, update } = require("../services/data");
+const { create, getAll, getById, update, deleteById } = require("../services/data");
 
 //TODO replace with real router according to exam description
 const homeRouter = Router();
@@ -118,6 +118,21 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
         } catch (err) {
             res.render('edit', { volcanoData, errors: parseError(err).errors });
         }
-    })
+    });
 
-module.exports = { homeRouter }
+    homeRouter.get('/catalog/:id/delete', async (req, res) => {
+        console.log('Is it work?!?');
+        
+        try {
+            const id =req.params.id;
+            const userId = req.user._id;
+            await deleteById(id, userId);
+            res.redirect('/catalog');
+        } catch (error) {
+            console.log(error);
+            
+            res.render('404');
+        }
+    });
+
+module.exports = { homeRouter };

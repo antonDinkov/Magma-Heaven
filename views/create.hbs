@@ -1,36 +1,35 @@
-<!-- In case of error, you should display div with class "errorContainer" -->
-<!-- You can choose to display the first error or all of them (error message/s in your opinion) -->
-
-<!-- <div>
-            <div class="errorContainer">
-                <p>Error</p>
-            </div>
-        </div> -->
 <section id="create-container">
     <div class="create-container-info">
         <h1>Create Volcano Wiki</h1>
         <form method="post">
             <label>Name:</label>
-            <input type="text" id="name" name="name" placeholder="..." {{#if data.name}}value="{{data.name}}"{{/if}}>
+            <input type="text" id="name" name="name" placeholder="..." {{#if data.name}}value="{{data.name}}" {{/if}}>
             <label>Location:</label>
-            <input type="text" id="location" name="location" placeholder="..." {{#if data.location}}value="{{data.location}}"{{/if}}>
+            <input type="text" id="location" name="location" placeholder="..." {{#if
+                data.location}}value="{{data.location}}" {{/if}}>
             <label>Elevation:</label>
-            <input type="number" id="elevations" name="elevations" placeholder="..." {{#if data.elevations}}value="{{data.elevations}}"{{/if}}>
+            <input type="number" id="elevations" name="elevation" placeholder="..." {{#if
+                data.elevations}}value="{{data.elevations}}" {{/if}}>
             <label>Year of Last Eruption:</label>
-            <input type="number" id="last-year-eruption" name="last-year-eruption" placeholder="..." {{#if data.last-year-eruption}}value="{{data.last-year-eruption}}"{{/if}}>
+            <input type="number" id="last-year-eruption" name="year" placeholder="..." {{#if
+                data.year}}value="{{data.year}}" {{/if}}>
             <label>Image:</label>
-            <input type="text" id="image" name="image" placeholder="http://..." {{#if data.image}}value="{{data.image}}"{{/if}}>
+            <input type="text" id="image" name="image" placeholder="http://..." {{#if data.image}}value="{{data.image}}"
+                {{/if}}>
             <label>Volcano Type:</label>
             <select id="type" name="volcano">
-                <option value="Supervolcanoes">Supervolcanoes</option>
-                <option value="Submarine">Submarine</option>
-                <option value="Subglacial">Subglacial</option>
-                <option value="Mud">Mud</option>
-                <option value="Stratovolcanoes">Stratovolcanoes</option>
-                <option value="Shield">Shield</option>
+                <option value="Supervolcanoes" {{#if (eq data.volcano 'Supervolcanoes' )}}selected{{/if}}>Supervolcanoes
+                </option>
+                <option value="Submarine" {{#if (eq data.volcano 'Submarine' )}}selected{{/if}}>Submarine</option>
+                <option value="Subglacial" {{#if (eq data.volcano 'Subglacial' )}}selected{{/if}}>Subglacial</option>
+                <option value="Mud" {{#if (eq data.volcano 'Mud' )}}selected{{/if}}>Mud</option>
+                <option value="Stratovolcanoes" {{#if (eq data.volcano 'Stratovolcanoes' )}}selected{{/if}}>
+                    Stratovolcanoes</option>
+                <option value="Shield" {{#if (eq data.volcano 'Shield' )}}selected{{/if}}>Shield</option>
             </select>
             <label>Description:</label>
-            <textarea id="description" name="description" placeholder="..." {{#if data.description}}value="{{data.description}}"{{/if}}></textarea>
+            <textarea id="description" name="description" placeholder="..." {{#if
+                data.description}}value="{{data.description}}" {{/if}}></textarea>
             <input type="submit" id="btn" value="Submit"></input>
         </form>
     </div>

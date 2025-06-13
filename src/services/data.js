@@ -11,9 +11,15 @@ async function getById(id) {
 };
 
 async function create(data, authorId) {
-//TODO extract properties from view model
     const record = new Data({
-        prop: data.prop,
+        name: data.name,
+        location: data.location,
+        elevation: Number(data.elevation),
+        year: Number(data.year),
+        image: data.image,
+        volcano: data.volcano,
+        description: data.description,
+        voteList: [],
         author: authorId
     });
 
@@ -22,7 +28,7 @@ async function create(data, authorId) {
     return record;
 };
 
-async function update(id, data, userId ) {
+async function update(id, data, userId) {
     const record = await Data.findById(id);
 
     if (!record) {

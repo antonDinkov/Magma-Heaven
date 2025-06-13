@@ -22,7 +22,7 @@ function isGuest() {
 
 function isOwner() {
     return async function (req, res, next) {
-        if (!req.user) {
+        /* if (!req.user) {
             return res.redirect('/login');
         }
         
@@ -34,8 +34,8 @@ function isOwner() {
             return next();
         } else {
             return res.redirect(`/catalog/${req.params.id}`);
-        }
-       /* try {
+        } */
+       try {
             if (!req.user) {
                 return res.redirect('/login');
             }
@@ -55,9 +55,9 @@ function isOwner() {
         } catch (err) {
             console.error('Middleware error:', err);
             return res.redirect('/500');
-        } */
+        }
     }
-}
+};
 
 module.exports = {
     isUser,

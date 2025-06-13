@@ -2,7 +2,7 @@ const { Router } = require("express");
 const { isUser } = require("../middlewares/guards");
 const { body, validationResult } = require("express-validator");
 const { parseError } = require("../util");
-const { create, getAll } = require("../services/data");
+const { create, getAll, getById } = require("../services/data");
 
 //TODO replace with real router according to exam description
 const homeRouter = Router();
@@ -46,8 +46,31 @@ async (req, res) => {
 });
 
 homeRouter.get('/catalog', async (req, res) => {
-    const movies = await getAll();
-    res.render('catalog', { movies });
+    const volcanoes = await getAll();
+    res.render('catalog', { volcanoes });
+});
+
+homeRouter.get('/catalog/:id', async (req, res) => {
+    console.log('Test to see if render');
+    
+    const id = req.params.id;
+    console.log('Before volcano data');
+    
+    const volcanoData = await getById(id);
+    console.log('After volcano data: ', volcanoData);
+    
+    let voteCount = volcanoData.voteList.length;
+
+    if (!volcanoData) {
+        res.render('404');
+        return;
+    };
+
+    const isLoggedIn = req.user;
+    const isAuthor = req.user?._id == volcanoData.author.toString();
+    const hasVoted = Boolean(volcanoData.voteList.find(id => id.toString() == req.user?._id));
+
+    res.render('details', { volcanoData, voteCount, isLoggedIn, isAuthor, hasVoted });
 });
 
 module.exports = { homeRouter }

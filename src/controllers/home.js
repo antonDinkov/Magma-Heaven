@@ -1,8 +1,8 @@
 const { Router } = require("express");
-const { isUser } = require("../middlewares/guards");
+const { isUser, isOwner } = require("../middlewares/guards");
 const { body, validationResult } = require("express-validator");
 const { parseError } = require("../util");
-const { create, getAll, getById } = require("../services/data");
+const { create, getAll, getById, update } = require("../services/data");
 
 //TODO replace with real router according to exam description
 const homeRouter = Router();
@@ -16,34 +16,34 @@ homeRouter.get('/', (req, res) => {
 })
 
 
-homeRouter.get('/create', isUser(), (req, res) =>{
+homeRouter.get('/create', isUser(), (req, res) => {
     res.render('create');
 });
-homeRouter.post('/create', isUser(), 
-body('name').trim().isLength({ min: 2 }).withMessage('The Name should be atleast 2 characters'),
-body('location').trim().isLength({ min: 2 }).withMessage('The Location should be atleast 2 characters'),
-body('elevation').trim().isNumeric({ min: 0 }).withMessage('The Elevation should be minimum 0'),
-body('year').trim().isNumeric({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
-body('image').trim().isURL().withMessage('The volcano image should start with http:// or https://'),
-body('volcano').isIn(["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]).withMessage('The Type should be select between ["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]'),
-body('description').trim().isLength({ min: 10 }).withMessage('The Description should be atleast 10 characters long'),
-async (req, res) => {
-    const { name, location, elevation, year, image, volcano, decription} = req.body;
-    try {
-        const validation = validationResult(req);
-        if (!validation.isEmpty) {
-            throw validation.array();
+homeRouter.post('/create', isUser(),
+    body('name').trim().isLength({ min: 2 }).withMessage('The Name should be atleast 2 characters'),
+    body('location').trim().isLength({ min: 2 }).withMessage('The Location should be atleast 2 characters'),
+    body('elevation').trim().isNumeric({ min: 0 }).withMessage('The Elevation should be minimum 0'),
+    body('year').trim().isNumeric({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
+    body('image').trim().isURL({ require_tld: false }).withMessage('The volcano image should start with http:// or https://'),
+    body('volcano').isIn(["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]).withMessage('The Type should be select between ["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]'),
+    body('description').trim().isLength({ min: 10 }).withMessage('The Description should be atleast 10 characters long'),
+    async (req, res) => {
+        const { name, location, elevation, year, image, volcano, decription } = req.body;
+        try {
+            const validation = validationResult(req);
+            if (!validation.isEmpty) {
+                throw validation.array();
+            }
+
+            const authorId = req.user._id;
+
+            const result = await create(req.body, authorId);
+
+            res.redirect('/catalog');
+        } catch (err) {
+            res.render('create', { data: { name, location, elevation, year, image, volcano, decription }, errors: parseError(err).errors })
         }
-
-        const authorId = req.user._id;
-
-        const result = await create(req.body, authorId);
-
-        res.redirect('/catalog');
-    } catch (err) {
-        res.render('create', { data: { name, location, elevation, year, image, volcano, decription }, errors: parseError(err).errors})
-    }
-});
+    });
 
 homeRouter.get('/catalog', async (req, res) => {
     const volcanoes = await getAll();
@@ -51,14 +51,9 @@ homeRouter.get('/catalog', async (req, res) => {
 });
 
 homeRouter.get('/catalog/:id', async (req, res) => {
-    console.log('Test to see if render');
-    
     const id = req.params.id;
-    console.log('Before volcano data');
-    
     const volcanoData = await getById(id);
-    console.log('After volcano data: ', volcanoData);
-    
+
     let voteCount = volcanoData.voteList.length;
 
     if (!volcanoData) {
@@ -72,5 +67,57 @@ homeRouter.get('/catalog/:id', async (req, res) => {
 
     res.render('details', { volcanoData, voteCount, isLoggedIn, isAuthor, hasVoted });
 });
+
+
+homeRouter.get('/catalog/:id/edit', isOwner(), async (req, res) => {
+    try {
+        const volcanoData = await getById(req.params.id);
+
+        if (!volcanoData) {
+            res.render('404');
+            return;
+        };
+
+        res.render('edit', { volcanoData });
+    } catch (err) {
+        console.error('Error loading edit form: ', err);
+        res.redirect('/404');
+    }
+});
+homeRouter.post('/catalog/:id/edit', isOwner(),
+    body('name').trim().isLength({ min: 2 }).withMessage('The Name should be atleast 2 characters'),
+    body('location').trim().isLength({ min: 2 }).withMessage('The Location should be atleast 2 characters'),
+    body('elevation').trim().isNumeric({ min: 0 }).withMessage('The Elevation should be minimum 0'),
+    body('year').trim().isNumeric({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
+    /* body('image').trim().notEmpty().withMessage('Image path is required').bail().custom(value => {
+    if (!value.startsWith('http://') && !value.startsWith('https://') && !value.startsWith('/')) {
+      throw new Error('Image URL must start with http://, https:// or /');
+    }
+    return true;
+  }), */
+                                        /* tld = Top Level Domain */
+    body('image').trim().isURL({ require_tld: false }).withMessage('The volcano image should start with http:// or https://'),
+    body('volcano').isIn(["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]).withMessage('The Type should be select between ["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]'),
+    body('description').trim().isLength({ min: 10 }).withMessage('The Description should be atleast 10 characters long'),
+    async (req, res) => {
+        const volcanoData = await getById(req.params.id);
+        try {
+            const validation = validationResult(req);
+
+            if (!validation.isEmpty()) {
+                throw validation.array();
+            }
+
+            if (!volcanoData) {
+                res.render('404');
+                return;
+            };
+
+            const newRecord = await update(req.params.id, req.user._id, req.body);
+            res.redirect(`/catalog/${req.params.id}`);
+        } catch (err) {
+            res.render('edit', { volcanoData, errors: parseError(err).errors });
+        }
+    })
 
 module.exports = { homeRouter }

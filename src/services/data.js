@@ -28,7 +28,7 @@ async function create(data, authorId) {
     return record;
 };
 
-async function update(id, data, userId) {
+async function update(id, userId, newData) {
     const record = await Data.findById(id);
 
     if (!record) {
@@ -40,10 +40,17 @@ async function update(id, data, userId) {
     };
 
     //TODO replace with real properties
+    record.name = newData.name;
+    record.location = newData.location;
+    record.elevation = newData.elevation;
+    record.year = newData.year;
+    record.image = newData.image;
+    record.volcano = newData.volcano;
+    record.description = newData.description;
 
     await record.save();
 
-    return;
+    return record;
 };
 
 async function deleteById(id, userId) {

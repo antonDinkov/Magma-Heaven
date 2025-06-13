@@ -1,6 +1,5 @@
 const { Router } = require("express");
-const { login } = require("../services/user");
-const { createToken } = require("../services/jwt");
+const { isUser } = require("../middlewares/guards");
 
 //TODO replace with real router according to exam description
 const homeRouter = Router();
@@ -12,5 +11,13 @@ homeRouter.get('/', (req, res) => {
     //res.cookie('token', token)
     res.render('home');
 })
+
+
+homeRouter.get('/create', isUser(), (req, res) =>{
+    res.render('create');
+});
+homeRouter.post('/create', isUser(), (req, res) => {
+
+});
 
 module.exports = { homeRouter }

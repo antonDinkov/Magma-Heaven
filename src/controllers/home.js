@@ -145,4 +145,9 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
         }
     });
 
+    homeRouter.get('/search', async (req, res) => {
+        const volcanoes = await getAll();
+        res.render('search', { volcanoes });
+    });
+
 module.exports = { homeRouter };

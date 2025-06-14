@@ -22,16 +22,16 @@ homeRouter.get('/create', isUser(), (req, res) => {
 homeRouter.post('/create', isUser(),
     body('name').trim().isLength({ min: 2 }).withMessage('The Name should be atleast 2 characters'),
     body('location').trim().isLength({ min: 2 }).withMessage('The Location should be atleast 2 characters'),
-    body('elevation').trim().isNumeric({ min: 0 }).withMessage('The Elevation should be minimum 0'),
-    body('year').trim().isNumeric({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
+    body('elevation').trim().notEmpty().withMessage('Elevation is required').bail().isInt({ min: 0 }).withMessage('The Elevation should be minimum 0'),
+    body('year').trim().notEmpty().withMessage('Year is required').bail().isInt({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
     body('image').trim().isURL({ require_tld: false }).withMessage('The volcano image should start with http:// or https://'),
     body('volcano').isIn(["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]).withMessage('The Type should be select between ["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]'),
     body('description').trim().isLength({ min: 10 }).withMessage('The Description should be atleast 10 characters long'),
     async (req, res) => {
-        const { name, location, elevation, year, image, volcano, decription } = req.body;
+        const { name, location, elevation, year, image, volcano, description } = req.body;
         try {
             const validation = validationResult(req);
-            if (!validation.isEmpty) {
+            if (!validation.isEmpty()) {
                 throw validation.array();
             }
 
@@ -41,7 +41,7 @@ homeRouter.post('/create', isUser(),
 
             res.redirect('/catalog');
         } catch (err) {
-            res.render('create', { data: { name, location, elevation, year, image, volcano, decription }, errors: parseError(err).errors })
+            res.render('create', { data: { name, location, elevation, year, image, volcano, description }, errors: parseError(err).errors })
         }
     });
 
@@ -87,8 +87,8 @@ homeRouter.get('/catalog/:id/edit', isOwner(), async (req, res) => {
 homeRouter.post('/catalog/:id/edit', isOwner(),
     body('name').trim().isLength({ min: 2 }).withMessage('The Name should be atleast 2 characters'),
     body('location').trim().isLength({ min: 2 }).withMessage('The Location should be atleast 2 characters'),
-    body('elevation').trim().isNumeric({ min: 0 }).withMessage('The Elevation should be minimum 0'),
-    body('year').trim().isNumeric({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
+    body('elevation').trim().isEmpty().withMessage('Elevation is required').bail().isInt({ min: 0 }).withMessage('The Elevation should be minimum 0'),
+    body('year').trim().isEmpty().withMessage('Year is required').bail().isInt({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
     /* body('image').trim().notEmpty().withMessage('Image path is required').bail().custom(value => {
     if (!value.startsWith('http://') && !value.startsWith('https://') && !value.startsWith('/')) {
       throw new Error('Image URL must start with http://, https:// or /');

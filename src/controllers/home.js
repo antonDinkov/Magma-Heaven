@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { isUser, isOwner } = require("../middlewares/guards");
+const { isUser, isOwner, hasVoted } = require("../middlewares/guards");
 const { body, validationResult } = require("express-validator");
 const { parseError } = require("../util");
 const { create, getAll, getById, update, deleteById, vote } = require("../services/data");
@@ -120,9 +120,7 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
         }
     });
 
-    homeRouter.get('/catalog/:id/delete', async (req, res) => {
-        console.log('Is it work?!?');
-        
+    homeRouter.get('/catalog/:id/delete', isOwner(), async (req, res) => {
         try {
             const id =req.params.id;
             const userId = req.user._id;
@@ -135,7 +133,7 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
         }
     });
 
-    homeRouter.get('/catalog/:id/vote', async (req, res) => {
+    homeRouter.get('/catalog/:id/vote', hasVoted(), async (req, res) => {
         try {
             await vote(req.params.id, req.user._id);
             res.redirect(`/catalog/${req.params.id}`);
@@ -146,8 +144,18 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
     });
 
     homeRouter.get('/search', async (req, res) => {
-        const volcanoes = await getAll();
-        res.render('search', { volcanoes });
+        const { search = '', volcano = ''} = req.query;
+        let volcanoes = await getAll();
+
+        if (search) {
+            volcanoes = volcanoes.filter(volc => volc.name.toLowerCase().includes(search.toLowerCase()));
+        }
+        if (volcano) {
+            volcanoes = volcanoes.filter(volc => volc.volcano == volcano);
+        }
+
+        res.render('search', { volcanoes, search, volcano });
     });
+    
 
 module.exports = { homeRouter };

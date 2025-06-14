@@ -10,6 +10,11 @@ async function getById(id) {
     return Data.findById(id).lean();
 };
 
+async function getByIdKey(id, key) {
+    const result = await Data.findById(id).select(key).lean();
+    return result?.[key] || [];
+};
+
 async function create(data, authorId) {
     const record = new Data({
         name: data.name,
@@ -84,6 +89,7 @@ async function deleteById(id, userId) {
 module.exports = {
     getAll,
     getById,
+    getByIdKey,
     create,
     update,
     vote,

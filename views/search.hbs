@@ -1,15 +1,15 @@
 <section class="volcano-search">
     <h1>Search</h1>
 
-    <form class="search-form" method="post">
-        <input type="text" class="search-volcano" name="search" placeholder="Search by Name...">
+    <form class="search-form" method="get">
+        <input type="text" class="search-volcano" name="search" placeholder="Search by Name..." {{#if search}}value="{{search}}"{{/if}}>
         <select id="type" name="volcano">
-            <option value="Supervolcanoes">Supervolcanoes</option>
-            <option value="Submarine">Submarine</option>
-            <option value="Subglacial">Subglacial</option>
-            <option value="Mud">Mud</option>
-            <option value="Stratovolcanoes">Stratovolcanoes</option>
-            <option value="Shield">Shield</option>
+            <option value="Supervolcanoes" {{#if (eq volcano 'Supervolcanoes' )}}selected{{/if}}>Supervolcanoes</option>
+            <option value="Submarine" {{#if (eq volcano 'Submarine' )}}selected{{/if}}>Submarine</option>
+            <option value="Subglacial"{{#if (eq volcano 'Subglacial' )}}selected{{/if}}>Subglacial</option>
+            <option value="Mud"{{#if (eq volcano 'Mud' )}}selected{{/if}}>Mud</option>
+            <option value="Stratovolcanoes"{{#if (eq volcano 'Stratovolcanoes' )}}selected{{/if}}>Stratovolcanoes</option>
+            <option value="Shield"{{#if (eq volcano 'Shield' )}}selected{{/if}}>Shield</option>
         </select>
         <button type="submit" class="btn-search">Search</button>
     </form>
@@ -27,5 +27,5 @@
             {{/if}}
         </div>
     </div>
-    
+
 </section>

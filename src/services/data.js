@@ -53,6 +53,21 @@ async function update(id, userId, newData) {
     return record;
 };
 
+async function vote(id, userId) {
+    const record = await Data.findById(id);
+
+    if (!record) {
+        throw new Error("Record not found " + id);
+    };
+
+    //TODO replace with real properties
+    record.voteList.push(userId);
+    
+    await record.save();
+
+    return record;
+}
+
 async function deleteById(id, userId) {
     const record = await Data.findById(id);
     if (!record) {
@@ -71,5 +86,6 @@ module.exports = {
     getById,
     create,
     update,
+    vote,
     deleteById
 }

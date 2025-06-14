@@ -2,7 +2,7 @@ const { Router } = require("express");
 const { isUser, isOwner } = require("../middlewares/guards");
 const { body, validationResult } = require("express-validator");
 const { parseError } = require("../util");
-const { create, getAll, getById, update, deleteById } = require("../services/data");
+const { create, getAll, getById, update, deleteById, vote } = require("../services/data");
 
 //TODO replace with real router according to exam description
 const homeRouter = Router();
@@ -128,9 +128,19 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
             const userId = req.user._id;
             await deleteById(id, userId);
             res.redirect('/catalog');
-        } catch (error) {
+        } catch (err) {
             console.log(error);
             
+            res.render('404');
+        }
+    });
+
+    homeRouter.get('/catalog/:id/vote', async (req, res) => {
+        try {
+            await vote(req.params.id, req.user._id);
+            res.redirect(`/catalog/${req.params.id}`);
+        } catch (err) {
+            console.log(err);
             res.render('404');
         }
     });

@@ -28,7 +28,7 @@
                 <p class="vote-message">You've already voted for this volcano!</p>
                 {{else}}
                 <!-- Logged in user who has not yet vote for this volcano-->
-                <a href="/vote" class="btn-vote">Vote</a>
+                <a href="/catalog/{{volcanoData._id}}/vote" class="btn-vote">Vote</a>
                 {{/if}}
             {{/if}}
         </div>

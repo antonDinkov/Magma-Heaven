@@ -2,7 +2,6 @@ const { verifyToken } = require("../services/jwt");
 
 function session() {
     return function (req, res, next) {
-        res.locals.title
         const token = req.cookies?.token;
 
         if (token) {

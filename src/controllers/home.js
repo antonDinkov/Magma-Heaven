@@ -12,14 +12,12 @@ homeRouter.get('/', (req, res) => {
     //const result = await login('John', '123456');
     //const token = createToken(result);
     //res.cookie('token', token)
-    res.locals.title = 'Home';
-    res.render('home');
+    res.render('home', { title: 'Home' });
 })
 
 
 homeRouter.get('/create', isUser(), (req, res) => {
-    res.locals.title = 'Create';
-    res.render('create');
+    res.render('create', { title: 'Create' });
 });
 homeRouter.post('/create', isUser(),
     body('name').trim().isLength({ min: 2 }).withMessage('The Name should be atleast 2 characters'),
@@ -48,22 +46,18 @@ homeRouter.post('/create', isUser(),
     });
 
 homeRouter.get('/catalog', async (req, res) => {
-    res.locals.title = 'Catalog';
     const volcanoes = await getAll();
-    res.render('catalog', { volcanoes });
+    res.render('catalog', { volcanoes, title: 'Catalog' });
 });
 
 homeRouter.get('/catalog/:id', async (req, res) => {
     
     const id = req.params.id;
     const volcanoData = await getById(id);
-
-    res.locals.title = `Details ${volcanoData.name}`;
-
     let voteCount = volcanoData.voteList.length;
 
     if (!volcanoData) {
-        res.render('404');
+        res.render('404', { title: 'Error' });
         return;
     };
 
@@ -71,7 +65,7 @@ homeRouter.get('/catalog/:id', async (req, res) => {
     const isAuthor = req.user?._id == volcanoData.author.toString();
     const hasVoted = Boolean(volcanoData.voteList.find(id => id.toString() == req.user?._id));
 
-    res.render('details', { volcanoData, voteCount, isLoggedIn, isAuthor, hasVoted });
+    res.render('details', { volcanoData, voteCount, isLoggedIn, isAuthor, hasVoted, title: `Details ${volcanoData.name}` });
 });
 
 
@@ -79,14 +73,12 @@ homeRouter.get('/catalog/:id/edit', isOwner(), async (req, res) => {
     try {
         const volcanoData = await getById(req.params.id);
 
-        res.locals.title = `Edit ${volcanoData.name}`;
-
         if (!volcanoData) {
             res.render('404');
             return;
         };
 
-        res.render('edit', { volcanoData });
+        res.render('edit', { volcanoData, title: `Edit ${volcanoData.name}` });
     } catch (err) {
         console.error('Error loading edit form: ', err);
         res.redirect('/404');
@@ -137,7 +129,7 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
         } catch (err) {
             console.log(error);
             
-            res.render('404');
+            res.render('404', { title: 'Error' });
         }
     });
 
@@ -147,12 +139,11 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
             res.redirect(`/catalog/${req.params.id}`);
         } catch (err) {
             console.log(err);
-            res.render('404');
+            res.render('404', { title: 'Error' });
         }
     });
 
     homeRouter.get('/search', async (req, res) => {
-        res.locals.title = 'Search';
         const { search = '', volcano = ''} = req.query;
         let volcanoes = await getAll();
 
@@ -163,7 +154,7 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
             volcanoes = volcanoes.filter(volc => volc.volcano == volcano);
         }
 
-        res.render('search', { volcanoes, search, volcano });
+        res.render('search', { volcanoes, search, volcano, title: 'Search' });
     });
     
 

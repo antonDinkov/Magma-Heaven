@@ -29,7 +29,7 @@ userRouter.post('/register', isGuest(),
 
             res.redirect('/');
         } catch (err) {
-            res.render('register', { data: { username: req.body.username, email: req.body.email }, errors: parseError(err).errors })
+            res.render('register', { data: { username: req.body.username, email: req.body.email }, errors: parseError(err).errors });
         }
 
     })

@@ -12,11 +12,13 @@ homeRouter.get('/', (req, res) => {
     //const result = await login('John', '123456');
     //const token = createToken(result);
     //res.cookie('token', token)
+    res.locals.title = 'Home';
     res.render('home');
 })
 
 
 homeRouter.get('/create', isUser(), (req, res) => {
+    res.locals.title = 'Create';
     res.render('create');
 });
 homeRouter.post('/create', isUser(),
@@ -46,13 +48,17 @@ homeRouter.post('/create', isUser(),
     });
 
 homeRouter.get('/catalog', async (req, res) => {
+    res.locals.title = 'Catalog';
     const volcanoes = await getAll();
     res.render('catalog', { volcanoes });
 });
 
 homeRouter.get('/catalog/:id', async (req, res) => {
+    
     const id = req.params.id;
     const volcanoData = await getById(id);
+
+    res.locals.title = `Details ${volcanoData.name}`;
 
     let voteCount = volcanoData.voteList.length;
 
@@ -72,6 +78,8 @@ homeRouter.get('/catalog/:id', async (req, res) => {
 homeRouter.get('/catalog/:id/edit', isOwner(), async (req, res) => {
     try {
         const volcanoData = await getById(req.params.id);
+
+        res.locals.title = `Edit ${volcanoData.name}`;
 
         if (!volcanoData) {
             res.render('404');
@@ -144,6 +152,7 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
     });
 
     homeRouter.get('/search', async (req, res) => {
+        res.locals.title = 'Search';
         const { search = '', volcano = ''} = req.query;
         let volcanoes = await getAll();
 

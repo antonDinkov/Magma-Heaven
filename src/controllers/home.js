@@ -87,8 +87,8 @@ homeRouter.get('/catalog/:id/edit', isOwner(), async (req, res) => {
 homeRouter.post('/catalog/:id/edit', isOwner(),
     body('name').trim().isLength({ min: 2 }).withMessage('The Name should be atleast 2 characters'),
     body('location').trim().isLength({ min: 2 }).withMessage('The Location should be atleast 2 characters'),
-    body('elevation').trim().isEmpty().withMessage('Elevation is required').bail().isInt({ min: 0 }).withMessage('The Elevation should be minimum 0'),
-    body('year').trim().isEmpty().withMessage('Year is required').bail().isInt({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
+    body('elevation').trim().notEmpty().withMessage('Elevation is required').bail().isInt({ min: 0 }).withMessage('The Elevation should be minimum 0'),
+    body('year').trim().notEmpty().withMessage('Year is required').bail().isInt({ min: 0, max: 2024 }).withMessage('The Year of Last Eruption should be between 0 and 2024 characters long'),
     /* body('image').trim().notEmpty().withMessage('Image path is required').bail().custom(value => {
     if (!value.startsWith('http://') && !value.startsWith('https://') && !value.startsWith('/')) {
       throw new Error('Image URL must start with http://, https:// or /');
@@ -96,7 +96,7 @@ homeRouter.post('/catalog/:id/edit', isOwner(),
     return true;
   }), */
                                         /* tld = Top Level Domain */
-    body('image').trim().isURL({ require_tld: false }).withMessage('The volcano image should start with http:// or https://'),
+    body('image').trim().isURL({ require_tld: false, require_protocol: true }).withMessage('The volcano image should start with http:// or https://'),
     body('volcano').isIn(["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]).withMessage('The Type should be select between ["Supervolcanoes", "Submarine", "Subglacial", "Mud", "Stratovolcanoes", "Shield"]'),
     body('description').trim().isLength({ min: 10 }).withMessage('The Description should be atleast 10 characters long'),
     async (req, res) => {
